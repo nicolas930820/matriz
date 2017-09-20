@@ -3,4 +3,4 @@ CC=g++ -std=c++11
 all: mult
 
 mult:mult.cpp
-	$(CC) mult.cpp -o mult
+	$(CC) mult.cpp -o mult -lpthread

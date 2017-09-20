@@ -8,16 +8,12 @@
 using namespace std;
 using Mat = vector<vector<int>>;
 
-void dot (const Mat &m1, const Mat &m2, int a, Mat &res){
-  int k = m2.size();    // number of rows in m2
+void dot (const Mat &m1, const Mat &m2, int a, int b, int &res){
   int j = m1[0].size(); // number of cols in m1
-  int l = m2[0].size(); // number of cols in m2
+  for (int c = 0; c < j; c++) {
+    res += m1[a][c] * m2[c][b];
 
-  for (int b = 0; b < l; b++) {
-    for (int c = 0; c < j; c++) {
-      res[a][b] += m1[a][c] * m2[c][b];
-    }
-  }
+}
 }
 
 void mult0(const Mat &m1, const Mat &m2, Mat &res) {
@@ -25,18 +21,16 @@ void mult0(const Mat &m1, const Mat &m2, Mat &res) {
   int j = m1[0].size(); // number of cols in m1
   int k = m2.size();    // number of rows in m2
   int l = m2[0].size(); // number of cols in m2
-
-  assert(j == k);
   vector<thread> ts;
-  ts.reserve(i);
+  assert(j == k);
 
   for (int a = 0; a < i; a++) {
-  //  for (int b = 0; b < l; b++) {
+    for (int b = 0; b < l; b++) {
       //mov constructor que crea el hilo directamente en ts.
       // thread t(dot,cref(m1), cref(m2), ref(a), ref(b), ref(res[a][b]));
       // t.join();
-      ts.push_back(thread(dot,cref(m1), cref(m2), ref(a), ref(res)));
-  //  }
+      ts.push_back(thread(dot,cref(m1), cref(m2), ref(a), ref(b), ref(res[a][b])));
+    }
   }
   for (thread &t: ts)
     t.join();
@@ -54,10 +48,8 @@ int main(int argc, char **argv) {
   for (int i = 0; i < g.size(); i++) {
     r[i].resize(g.size());
   }
-  {
-    Timer t("mult0");
-    mult0(g, g, r);
-    cout << t.elapsed() << " ns." << endl;
-    return 0;
-  }
+  Timer t("mult0");
+  mult0(g, g, r);
+  cout << t.elapsed() << " ns." << endl;
+  return 0;
 }
